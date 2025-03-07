@@ -1,0 +1,31 @@
+	import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import BSpline, make_interp_spline
+
+# Definir puntos de control
+control_points = np.array([(0, 0), (1, 2), (3, 3), (4, 0), (5, 2)])
+n = len(control_points) - 1 # Número de segmentos
+
+# Crear vectores de nudos con repetición en los extremos para suavidad
+k = 3 # Grado de la B-spline (cúbica)
+knot_vector = np.concatenate(([0] * k, np.linspace(0, 1, n - k + 2), [1] * k))
+
+# Separar coordenadas X e Y
+x, y = control_points[:,0], control_points[:, 1]
+
+# Crear la B-spline
+spline_x = BSpline(knot_vector, x, k)
+spline_y = BSpline(knot_vector, y, k)
+
+t = np.linspace(0, 1, 100)
+curve_x, curve_y = spline_x(t), spline_y(t)
+
+# Graficar la curva y los putnos de control
+plt.plot(curve_x, curve_y, label='Curva B-spline')
+plt.scatter(x, y, color='red', label='Puntos de control')
+plt.plot(x, y, linestyle='dashed', color='gray', alpha=0.5)
+plt.legend()
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Curva B-spline en Python')
+plt.show()
