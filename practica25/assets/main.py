@@ -1,0 +1,66 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from matplotlib.animation import FuncAnimation
+def generar_piramide(base_size=1, altura=1.5):
+    base = np.array(
+        [
+            [-base_size, -base_size, 0],
+            [base_size, -base_size, 0],
+            [base_size, base_size, 0],
+            [-base_size, base_size, 0],
+        ]
+    )
+    # Punto superior de la pirámide con variación procedural
+    peak = np.array([0, 0, altura + np.random.uniform(-0.2, 0.2)])
+
+    # Definir las caras de la pirámide
+    caras = [
+        [base[0], base[1], base[2], base[3]],
+        [base[0], base[1], peak],
+        [base[1], base[2], peak],
+        [base[2], base[3], peak],
+        [base[3], base[0], peak],
+    ]
+    return caras
+
+# Crear la figura y el eje 3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+
+# Generar y dibujar múltiples pirámides procedurales
+for i in range(5):
+    for j in range(5):
+        offset_x, offset_y = i * 3, j * 3
+        piramide = generar_piramide()
+
+        # Dibujar cada pirámide con un desplazamiento
+        collection = Poly3DCollection(
+            [
+                [np.array(p) + [offset_x, offset_y, 0] for p in cara]
+                for cara in piramide
+            ],
+            facecolors="lightblue",
+            edgecolors="black",
+            alpha=0.6,
+        )
+        ax.add_collection(collection)
+
+ax.set_xlim(-2, 15)
+ax.set_ylim(-2, 15)
+ax.set_zlim(0, 2)
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+ax.set_title("Modelado Procedural - Pirámides")
+
+# Función de animación
+def update(frame):
+    ax.view_init(
+        elev=30, azim=frame
+    )  # Cambia azim para girar en Z, usa elev para girar en X
+
+ani = FuncAnimation(fig, update, frames=np.arange(0, 360, 2), interval=10)
+
+# Mostrar la figura
+plt.show()
